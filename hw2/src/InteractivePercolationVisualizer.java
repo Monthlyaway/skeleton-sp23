@@ -13,7 +13,6 @@ import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdOut;
 
 public class InteractivePercolationVisualizer {
-    /*
     private static final int DELAY = 20;
 
     public static void main(String[] args) {
@@ -50,6 +49,7 @@ public class InteractivePercolationVisualizer {
                     if (!perc.isOpen(i, j)) {
                         StdOut.println(i + " " + j);
                     }
+                    System.out.println("Trying to open (" + i + ", " + j + ")");
                     perc.open(i, j);
                 }
 
@@ -59,5 +59,4 @@ public class InteractivePercolationVisualizer {
             PercolationVisualizer.show(DELAY);
         }
     }
-    */
 }

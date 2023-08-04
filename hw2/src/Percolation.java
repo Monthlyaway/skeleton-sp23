@@ -1,38 +1,84 @@
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
-// TODO: Add any other necessary imports.
 
 public class Percolation {
-    // TODO: Add any necessary instance variables.
+    // whether sites are opened
+    private boolean[] sites;
+    private WeightedQuickUnionUF WQUUF;
+    private int N;
 
     public Percolation(int N) {
-        // TODO: Fill in this constructor.
+        sites = new boolean[N * N];  // default false
+        this.N = N;
+
+        // the last two items are virtual top site and virtual bottom site,
+        // refer to video https://www.youtube.com/watch?v=1RQz8ITHLME&list=PLNSdoiHk6ujjZs46s6XVXEbZUuF1MIO7g&index=4
+        WQUUF = new WeightedQuickUnionUF(N * N + 2);
+        for (int ix = 0; ix < N; ix++) {
+            WQUUF.union(ix, N * N);
+        }
+        for (int ix = N * (N - 1); ix < N * N; ix++) {
+            WQUUF.union(ix, N * N + 1);
+        }
     }
 
     public void open(int row, int col) {
-        // TODO: Fill in this method.
+        if (isOpen(row, col)) {
+            return;
+        }
+        int currIndex = xyTo1D(row, col);
+        sites[currIndex] = true;
+
+        if (validate(row - 1, col) && isOpen(row - 1, col)) {
+            int tempIndex = xyTo1D(row - 1, col);
+            WQUUF.union(tempIndex, currIndex);
+        }
+        if (validate(row + 1, col) && isOpen(row + 1, col)) {
+            int tempIndex = xyTo1D(row + 1, col);
+            WQUUF.union(tempIndex, currIndex);
+        }
+        if (validate(row, col - 1) && isOpen(row, col - 1)) {
+            int tempIndex = xyTo1D(row, col - 1);
+            WQUUF.union(tempIndex, currIndex);
+        }
+        if (validate(row, col + 1) && isOpen(row, col + 1)) {
+            int tempIndex = xyTo1D(row, col + 1);
+            WQUUF.union(tempIndex, currIndex);
+        }
     }
 
     public boolean isOpen(int row, int col) {
-        // TODO: Fill in this method.
-        return false;
+        return sites[xyTo1D(row, col)];
     }
 
     public boolean isFull(int row, int col) {
-        // TODO: Fill in this method.
-        return false;
+        if (isOpen(row, col)) {
+            return WQUUF.connected(xyTo1D(row, col), N * N);
+        } else {
+            return false;
+        }
     }
 
     public int numberOfOpenSites() {
-        // TODO: Fill in this method.
-        return 0;
+        int result = 0;
+        for (int row = 0; row < N; row++) {
+            for (int col = 0; col < N; col++) {
+                if (isOpen(row, col)) {
+                    result++;
+                }
+            }
+        }
+        return result;
     }
 
     public boolean percolates() {
-        // TODO: Fill in this method.
-        return false;
+        return WQUUF.connected(N * N, N * N + 1);
     }
 
-    // TODO: Add any useful helper methods (we highly recommend this!).
-    // TODO: Remove all TODO comments before submitting.
+    int xyTo1D(int row, int col) {
+        return row * N + col;
+    }
 
+    boolean validate(int row, int col) {
+        return row >= 0 && row < N && col >= 0 && col < N;
+    }
 }

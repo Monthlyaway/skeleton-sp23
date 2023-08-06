@@ -8,7 +8,7 @@ import java.util.List;
 
 import static com.google.common.truth.Truth.assertThat;
 
-/** Unit Tests for the TimeSeries class.
+/** Unit Tests for the TimeSeries class. <code>testFromSpec</code> is likely named to indicate that it tests the TimeSeries class's behavior based on a specific specification of how the <code>plus</code> method should work.
  *  @author Josh Hug
  */
 public class TimeSeriesTest {

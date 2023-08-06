@@ -1,11 +1,15 @@
 package ngordnet.ngrams;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import edu.princeton.cs.algs4.In;
 
 /**
  * An object that provides utility methods for making queries on the
  * Google NGrams dataset (or a subset thereof).
- *
+ * <p>
  * An NGramMap stores pertinent data from a "words file" and a "counts
  * file". It is not a map in the strict sense, but it does provide additional
  * functionality.
@@ -17,12 +21,44 @@ public class NGramMap {
     private static final int MIN_YEAR = 1400;
     private static final int MAX_YEAR = 2100;
     // TODO: Add any necessary static/instance variables.
+    private Map<String, TimeSeries> wordsMap;
+    TimeSeries countsSeries;
 
     /**
      * Constructs an NGramMap from WORDSFILENAME and COUNTSFILENAME.
      */
     public NGramMap(String wordsFilename, String countsFilename) {
-        // TODO: Fill in this constructor. See the "NGramMap Tips" section of the spec for help.
+        In wordsFile = new In(wordsFilename);
+        In countsFile = new In(countsFilename);
+
+        wordsMap = new HashMap<>();
+        countsSeries = new TimeSeries();
+
+        while (wordsFile.hasNextLine()) {
+            String word = wordsFile.readString();
+            int year = wordsFile.readInt();
+            double count = wordsFile.readDouble();
+            wordsFile.readLine();
+
+            if (wordsMap.get(word) == null) {
+                TimeSeries ts = new TimeSeries();
+                ts.put(year, count);
+                wordsMap.put(word, ts);
+            } else {
+                TimeSeries presentTS = wordsMap.get(word);
+                presentTS.put(year, count);
+                wordsMap.put(word, presentTS);
+            }
+        }
+
+        while (countsFile.hasNextLine()) {
+            String line = countsFile.readLine();
+            String[] tokens = line.split(",");
+            int year = Integer.parseInt(tokens[0].trim());
+            double countOfWords = Double.parseDouble(tokens[1].trim());
+
+            countsSeries.put(year, countOfWords);
+        }
     }
 
     /**
@@ -32,8 +68,12 @@ public class NGramMap {
      * NGramMap. This is also known as a "defensive copy".
      */
     public TimeSeries countHistory(String word, int startYear, int endYear) {
-        // TODO: Fill in this method.
-        return null;
+        if (!validateYearsAug(startYear, endYear)) {
+            throw new IllegalArgumentException("startYear < MIN_YEAR || endYear > MAX_YEAR");
+        }
+
+        TimeSeries originalSeries = wordsMap.get(word);
+        return new TimeSeries(originalSeries, startYear, endYear);
     }
 
     /**
@@ -43,16 +83,14 @@ public class NGramMap {
      * NGramMap. This is also known as a "defensive copy".
      */
     public TimeSeries countHistory(String word) {
-        // TODO: Fill in this method.
-        return null;
+        return new TimeSeries(wordsMap.get(word));
     }
 
     /**
      * Returns a defensive copy of the total number of words recorded per year in all volumes.
      */
     public TimeSeries totalCountHistory() {
-        // TODO: Fill in this method.
-        return null;
+        return new TimeSeries(countsSeries);
     }
 
     /**
@@ -60,8 +98,12 @@ public class NGramMap {
      * and ENDYEAR, inclusive of both ends.
      */
     public TimeSeries weightHistory(String word, int startYear, int endYear) {
-        // TODO: Fill in this method.
-        return null;
+        if (!validateYearsAug(startYear, endYear)) {
+            throw new IllegalArgumentException("startYear < MIN_YEAR || endYear > MAX_YEAR");
+        }
+
+        TimeSeries ts = new TimeSeries(wordsMap.get(word), startYear, endYear);
+        return ts.dividedBy(countsSeries);
     }
 
     /**
@@ -70,8 +112,8 @@ public class NGramMap {
      * TimeSeries.
      */
     public TimeSeries weightHistory(String word) {
-        // TODO: Fill in this method.
-        return null;
+        TimeSeries weight = new TimeSeries(wordsMap.get(word));
+        return weight.dividedBy(countsSeries);
     }
 
     /**
@@ -81,18 +123,28 @@ public class NGramMap {
      */
     public TimeSeries summedWeightHistory(Collection<String> words,
                                           int startYear, int endYear) {
-        // TODO: Fill in this method.
-        return null;
+        TimeSeries sum = new TimeSeries();
+        TimeSeries result;
+
+        /*
+         * ALl the variables referenced in lambda scope are implicitly final, which means they
+         * can not be changed after initialization.
+         */
+        for (String word : words) {
+            TimeSeries weight = weightHistory(word, startYear, endYear);
+            sum = sum.plus(weight);
+        }
+        return sum;
     }
 
     /**
      * Returns the summed relative frequency per year of all words in WORDS.
      */
     public TimeSeries summedWeightHistory(Collection<String> words) {
-        // TODO: Fill in this method.
-        return null;
+        return summedWeightHistory(words, MIN_YEAR, MAX_YEAR);
     }
 
-    // TODO: Add any private helper methods.
-    // TODO: Remove all TODO comments before submitting.
+    private boolean validateYearsAug(int startYear, int endYear) {
+        return startYear >= MIN_YEAR && endYear <= MAX_YEAR;
+    }
 }

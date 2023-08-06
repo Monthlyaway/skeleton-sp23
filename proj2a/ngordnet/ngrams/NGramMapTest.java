@@ -8,8 +8,10 @@ import java.util.List;
 
 import static com.google.common.truth.Truth.assertThat;
 
-/** Unit Tests for the NGramMap class.
- *  @author Josh Hug
+/**
+ * Unit Tests for the NGramMap class.
+ *
+ * @author Josh Hug
  */
 public class NGramMapTest {
     @Test
@@ -44,10 +46,11 @@ public class NGramMapTest {
     @Test
     public void testOnLargeFile() {
         // creates an NGramMap from a large dataset
-        NGramMap ngm = new NGramMap("./data/ngrams/top_14377_words.csv",
+//        NGramMap ngm = new NGramMap("./data/ngrams/top_14377_words.csv",
+//                "./data/ngrams/total_counts.csv");
+        NGramMap ngm = new NGramMap("./data/ngrams/fish_and_cat.csv",
                 "./data/ngrams/total_counts.csv");
-
-        // returns the count of the number of occurrences of fish per year between 1850 and 1933.
+//         returns the count of the number of occurrences of fish per year between 1850 and 1933.
         TimeSeries fishCount = ngm.countHistory("fish", 1850, 1933);
         assertThat(fishCount.get(1865)).isWithin(1E-10).of(136497.0);
         assertThat(fishCount.get(1922)).isWithin(1E-10).of(444924.0);
@@ -57,7 +60,7 @@ public class NGramMapTest {
 
         // returns the relative weight of the word fish in each year between 1850 and 1933.
         TimeSeries fishWeight = ngm.weightHistory("fish", 1850, 1933);
-        assertThat(fishWeight.get(1865)).isWithin(1E-7).of(136497.0/2563919231.0);
+        assertThat(fishWeight.get(1865)).isWithin(1E-7).of(136497.0 / 2563919231.0);
 
         TimeSeries dogCount = ngm.countHistory("dog", 1850, 1876);
         assertThat(dogCount.get(1865)).isWithin(1E-10).of(75819.0);

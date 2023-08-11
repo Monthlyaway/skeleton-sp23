@@ -86,8 +86,8 @@ public class TestMyHashMap {
         assertThat(b.get("starChild")).isNull();
         b.put("starChild", 5);
         assertThat(b.get("starChild")).isEqualTo(5);
-        b.put("KISS", 5);
-        assertThat(b.get("KISS")).isEqualTo(5);
+        b.put("KISS", 6);
+        assertThat(b.get("KISS")).isEqualTo(6);
         assertThat(b.get("starChild")).isEqualTo(5);
     }
 
@@ -279,6 +279,7 @@ public class TestMyHashMap {
             ref.put(bm, m * 61);
             assertThat(map.containsKey(bm)).isEqualTo(ref.containsKey(bm));
             assertThat(map.get(bm)).isEqualTo(ref.get(bm));
+//            System.out.println(m);
             assertThat(map.get(b61)).isEqualTo(ref.get(b61));
             assertThat(map.size()).isEqualTo(ref.size());
         }

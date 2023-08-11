@@ -1,6 +1,7 @@
 import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.Scanner;
+import java.io.*;
 
 import edu.princeton.cs.algs4.Stopwatch;
 
@@ -12,30 +13,40 @@ import edu.princeton.cs.algs4.Stopwatch;
  * @author Brendan Hu
  */
 public class InsertInOrderSpeedTest {
-    /**
-     * Requests user input and performs tests of three different set
-     * implementations. ARGS is unused.
-     */
     public static void main(String[] args) {
-        Scanner input = new Scanner(System.in);
+        try {
+            // Specify the file path where you want to redirect the output
+            String filePath = "src/speedTestResults.txt";
 
-        // borrow waitForPositiveInt(Scanner input) from InsertRandomSpeedTest
-        System.out.println("This program inserts lexicographically "
-                + "increasing Strings into Maps as <String, Integer> pairs.");
+            // Create a File object with the specified file path
+            File file = new File(filePath);
 
-        String repeat;
-        do {
-            System.out.print("\nEnter # strings to insert into the maps: ");
-            int N = InsertRandomSpeedTest.waitForPositiveInt(input);
-            timeInOrderMap61B(new ULLMap<>(), N);
-            timeInOrderMap61B(new BSTMap<>(), N);
-            timeInOrderTreeMap(new TreeMap<>(), N);
-            timeInOrderHashMap(new HashMap<>(), N);
+            // Create a FileOutputStream to write to the file
+            FileOutputStream fileOutputStream = new FileOutputStream(file);
 
-            System.out.print("Would you like to try more timed-tests? (y/n): ");
-            repeat = input.nextLine();
-        } while (!repeat.equalsIgnoreCase("n") && !repeat.equalsIgnoreCase("no"));
-        input.close();
+            // Create a PrintStream to write to the file output stream
+            PrintStream printStream = new PrintStream(fileOutputStream);
+
+            // Store the current System.out for later restoration
+            PrintStream originalOut = System.out;
+
+            // Set System.out to the PrintStream that writes to the file
+            System.setOut(printStream);
+
+            // Call the original main method
+            InsertInOrderSpeedTestMain.main(args);
+
+            // Restore the original System.out
+            System.setOut(originalOut);
+
+            // Close the streams
+            printStream.close();
+            fileOutputStream.close();
+
+            System.out.println("Output redirected to " + filePath);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -51,6 +62,10 @@ public class InsertInOrderSpeedTest {
         }
         return sw.elapsedTime();
     }
+    /**
+     * Requests user input and performs tests of three different set
+     * implementations. ARGS is unused.
+     */
 
     /**
      * Returns time needed to put N strings into TreeMap in increasing order.
@@ -123,8 +138,6 @@ public class InsertInOrderSpeedTest {
         }
     }
 
-    /* ---------------------- Private methods ---------------------- */
-
     /**
      * To be called after catching a StackOverflowError
      * Prints the error with corresponding N and L
@@ -132,6 +145,32 @@ public class InsertInOrderSpeedTest {
     private static void printInfoOnStackOverflow(int N) {
         System.out.println("--Stack Overflow -- couldn't add "
                 + N + " strings.");
+    }
+
+    /* ---------------------- Private methods ---------------------- */
+
+    static class InsertInOrderSpeedTestMain {
+        static void main(String[] args) throws IOException {
+            Scanner input = new Scanner(System.in);
+
+            // borrow waitForPositiveInt(Scanner input) from InsertRandomSpeedTest
+            System.out.println("This program inserts lexicographically "
+                    + "increasing Strings into Maps as <String, Integer> pairs.");
+
+            String repeat;
+            do {
+                System.out.println("\nEnter # strings to insert into the maps: ");
+                int N = InsertRandomSpeedTest.waitForPositiveInt(input);
+                timeInOrderMap61B(new ULLMap<>(), N);
+                timeInOrderMap61B(new BSTMap<>(), N);
+                timeInOrderTreeMap(new TreeMap<>(), N);
+                timeInOrderHashMap(new HashMap<>(), N);
+
+                System.out.print("Would you like to try more timed-tests? (y/n): ");
+                repeat = input.nextLine();
+            } while (!repeat.equalsIgnoreCase("n") && !repeat.equalsIgnoreCase("no"));
+            input.close();
+        }
     }
 
 }

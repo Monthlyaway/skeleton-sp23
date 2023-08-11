@@ -1,5 +1,4 @@
 package ngordnet.main;
-
 import ngordnet.browser.NgordnetServer;
 import ngordnet.ngrams.NGramMap;
 
